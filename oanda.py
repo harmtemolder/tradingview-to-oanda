@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import math
 import requests
 
 logging.basicConfig(level=logging.INFO)
@@ -154,17 +155,21 @@ def post_order(instrument, units, price, stop_loss_percent,
 
     response = requests.request("POST", url, headers=headers, data=payload_str)
     response_text = response.text.encode("utf8")
-    logging.info(response_text)
+    response_json = json.loads(response_text)
 
-
+    logging.info(json.dumps(response_json, indent=2, sort_keys=True))
 
 if __name__ == "__main__":
+    size = 1000 # i.e. €1,000
+    price = 1486.891
+
     post_order(
         instrument="XAU_EUR",
-        units=1000,
-        price=1490.322,
+        units=math.ceil(size / price), # rounded up to whole units
+        price=price,
         stop_loss_percent=0.03, # as positive decimal
         trailing_stop_loss_percent=0.01, # as positive decimal
         take_profit_percent=0.06, # as positive decimal
+        price_decimals=3, # the number of decimals of precision
         trading_type="practice"
     )
