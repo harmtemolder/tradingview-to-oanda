@@ -20,3 +20,17 @@ I'm setting up a [web.py](https://webpy.org/) server that can run on PythonAnywh
 ## Prerequisites
 * `pip install web.py`
 * `conda install requests`
+* a `credentials.json` file containing a JSON like this:
+
+```json
+{
+  "practice_credentials": {
+    "oanda_key": "<YOUR PRACTICE ACCOUNT API KEY>",
+    "account_id": "<YOUR PRACTICE ACCOUNT ID>"
+  },
+  "live_credentials": {
+    "oanda_key": "<YOUR LIVE ACCOUNT API KEY>",
+    "account_id": "<YOUR LIVE ACCOUNT ID>"
+  }
+}
+```
