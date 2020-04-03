@@ -17,18 +17,18 @@ def get_datetime_now():
     return "{}Z".format(now.isoformat("T"))
 
 def get_credentials(trading_type):
+    loc = "oanda.py:get_credentials"
     try:
         with open("credentials.json") as credentials_json:
             credentials = (json.load(credentials_json))
     except:
-        logging.exception("oanda.py/load_credentials: Could not read "
-                          "credentials from credentials.json")
+        logging.exception("{}: Could not read credentials from credentials.json"
+                          .format(loc))
         return False
 
     if not "{}_credentials".format(trading_type) in credentials:
-        logging.exception("oanda.py/load_credentials: Could not find "
-                          "'{}_credentials' in credentials.json".format(
-            trading_type))
+        logging.exception("{}: Could not find '{}_credentials' in credentials"
+                          ".json".format(loc, trading_type))
         return False
 
     return credentials["{}_credentials".format(trading_type)]
@@ -38,6 +38,7 @@ def get_base_url(trading_type):
         "trade" if trading_type == "live" else "practice")
 
 def get_accounts(trading_type="practice"):
+    loc = "oanda.py:get_accounts"
     # https://developer.oanda.com/rest-live-v20/account-ep/
 
     credentials = get_credentials(trading_type)
@@ -49,9 +50,10 @@ def get_accounts(trading_type="practice"):
     }
 
     response = requests.request("GET", url, headers=headers)
-    logging.info("oanda.py/get_accounts: {}".format(response.text.encode("utf8")))
+    logging.info("{}: {}".format(loc, response.text.encode("utf8")))
 
 def get_instruments(trading_type="practice"):
+    loc = "oanda.py:get_instruments"
     # https://developer.oanda.com/rest-live-v20/account-ep/
 
     credentials = get_credentials(trading_type)
@@ -70,26 +72,26 @@ def get_instruments(trading_type="practice"):
     instruments = json.loads(response.text.encode("utf8"))
     instruments_list = [instrument["name"] for instrument in instruments["instruments"]]
 
-    logging.info("oanda.py/get_instruments: {}".format(instruments_list))
+    logging.info("{}: {}".format(loc, instruments_list))
 
     return instruments_list
 
 def get_filtered_instruments(instrument_filter="EUR", trading_type="practice"):
+    loc = "oanda.py:get_filtered_instruments"
     instruments = get_instruments(trading_type)
     filtered_instruments = list(filter(lambda i: instrument_filter in i,
                                    instruments))
 
-    logging.info("oanda.py/get_filtered_instruments({}): {}".format(
-        instrument_filter,
-        filtered_instruments))
+    logging.info("{}({}): {}".format(loc, instrument_filter,
+                                     filtered_instruments))
 
     return filtered_instruments
 
-def post_order(instrument, units, price, stop_loss_percent,
-               trailing_stop_loss_percent, take_profit_percent,
-               price_decimals=3,
-               trading_type="practice"):
+def post_order(instrument, size, price, trailing_stop_loss_percent,
+               take_profit_percent, price_decimals=3, trading_type="practice"):
     # https://developer.oanda.com/rest-live-v20/order-ep/
+
+    loc = "oanda.py:post_order"
 
     credentials = get_credentials(trading_type)
 
@@ -99,7 +101,6 @@ def post_order(instrument, units, price, stop_loss_percent,
     )
 
     # Convert the entered percentages to the absolute values OANDA expects
-    stop_loss_price = price * (1 - stop_loss_percent)
     trailing_stop_loss_distance = trailing_stop_loss_percent * price
     take_profit_price = price * (1 + take_profit_percent)
 
@@ -110,19 +111,11 @@ def post_order(instrument, units, price, stop_loss_percent,
             "timeInForce": "GTD",
             "gtdTime": get_datetime_offset(15),
             "instrument": instrument,
-            "units": "{}".format(units),
+            "units": "{}".format(math.ceil(size / price)), # whole units
             "price": "{0:.{1}f}".format(price, price_decimals),
-            "stopLossOnFill": {
-                "timeInForce": "GTC",
-                "price": "{0:.{1}f}".format(stop_loss_price, price_decimals),
-                "clientExtensions":{
-                    "comment": "oanda.py/post_order/stop_loss",
-                    "tag": "stop_loss",
-                    "id": "{}_stop_loss".format(get_datetime_now())
-                },
-            },
             "trailingStopLossOnFill": {
-                "distance": "{0:.{1}f}".format(trailing_stop_loss_distance, price_decimals),
+                "distance": "{0:.{1}f}".format(trailing_stop_loss_distance,
+                                               price_decimals),
                 "timeInForce": "GTC",
                 "clientExtensions": {
                     "comment": "oanda.py/post_order/trailing_stop_loss",
@@ -157,18 +150,17 @@ def post_order(instrument, units, price, stop_loss_percent,
     response_text = response.text.encode("utf8")
     response_json = json.loads(response_text)
 
-    logging.info(json.dumps(response_json, indent=2, sort_keys=True))
+    logging.info("{}: {}".format(
+        loc, json.dumps(response_json, indent=2, sort_keys=True)))
+
+    return response_json
 
 if __name__ == "__main__":
-    size = 1000 # i.e. €1,000
-    price = 1486.891
-
-    post_order(
+    order_response = post_order(
         instrument="XAU_EUR",
-        units=math.ceil(size / price), # rounded up to whole units
-        price=price,
-        stop_loss_percent=0.03, # as positive decimal
-        trailing_stop_loss_percent=0.01, # as positive decimal
+        size=1000, # i.e. €1,000
+        price=1486.891,
+        trailing_stop_loss_percent=0.03, # as positive decimal
         take_profit_percent=0.06, # as positive decimal
         price_decimals=3, # the number of decimals of precision
         trading_type="practice"
