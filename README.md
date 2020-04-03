@@ -50,3 +50,31 @@ The webhook is only available on `/webhook/<ACCESS_TOKEN>` where `<ACCESS_TOKEN>
 Make sure to replace `<ACCESS_TOKEN>` with an access token of your choice (e.g. [have DuckDuckGo generate one for you](https://duckduckgo.com/?q=password+64))
 
 Note that these are the only valid endpoints. The server won't tell you anything if you're trying to reach it somewhere else.
+
+## Set up PythonAnywhere
+1. Create an account, if you don't have one already
+1. `git clone` this repository through a Bash console. (I'll assume you clone into `/home/<USERNAME>/tradingview-to-oanda` for the rest of the setup.)
+1. Go to the "Files" tab and upload your `credentials.json` and `access_tokens.json` to the repository's directory
+1. Create a virtualenv (I named it "tradingview-to-oanda" and used Python 3.7, see the [docs](https://help.pythonanywhere.com/pages/Virtualenvs)):
+  ```
+  mkvirtualenv tradingview-to-oanda --python=/usr/bin/python3.7
+  ```
+1. Open the "Web" tab and create a custom web app
+1. Set the following parameters:
+  * __Source code__ = The directory you cloned the repository into
+  * __Working directory__ = The same directory
+  * __Virtualenv__ = The directory of the virtualenv you created, probably something like `/home/<USERNAME>/.virtualenvs/tradingview-to-oanda`
+1. Then open the __WSGI configuration file__ linked from the Web tab
+1. Comment the `HELLO WORLD` bit (⌘+/ works here)
+1. Add this to the bottom:
+  ```
+  # +++++++++++ web.py +++++++++++
+  # Added by me, based on https://help.pythonanywhere.com/pages/WebDotPyWSGIConfig
+  import sys
+  sys.path.append('/home/<USERNAME>/tradingview-to-oanda')
+  from server import app
+  application = app.wsgifunc()
+  ```
+1. Save the file and go back to the Web tab
+1. Click the green Reload button
+1. Send a valid POST request to https://<USERNAME>.pythonanywhere.com/webhook/<ACCESS_TOKEN> and see if it reaches OANDA
