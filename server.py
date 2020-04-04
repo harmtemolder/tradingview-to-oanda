@@ -91,8 +91,7 @@ class webhook:
                               .format(loc, e))
             raise web.internalerror("Your JSON could not be read. Please try "
                                     "again.")
-        logging.info("{}: Request received with JSON: {}".format(
-            loc, json.dumps(post_data, indent=2, sort_keys=True)))
+        logging.info("{}: Request received with JSON".format(loc))
 
         # And, if it could be loaded, translate it to OANDA parameters
         try:
@@ -104,8 +103,7 @@ class webhook:
                                    "translated to OANDA parameters. Please try "
                                    "again.".format(
                 json.dumps(post_data, indent=2, sort_keys=True)))
-        logging.info("{}: Translated that to: {}".format(
-            loc, json.dumps(oanda_parameters, indent=2, sort_keys=True)))
+        logging.info("{}: Translated that to OANDA parameters".format(loc))
 
         # Then send those to OANDA as either a buy or sell order
         try:
@@ -124,9 +122,7 @@ class webhook:
                                     "Please try again.".format(
                 json.dumps(post_data, indent=2, sort_keys=True),
                 json.dumps(oanda_parameters, indent=2, sort_keys=True)))
-        logging.info("{}: Sent order to OANDA. This was their response: {}"
-                     .format(
-            loc, json.dumps(order_response, indent=2, sort_keys=True)))
+        logging.info("{}: Sent order to OANDA".format(loc))
 
         # And reply to the POST request
         web.header("Content-Type", "text/plain")
