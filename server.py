@@ -139,7 +139,7 @@ class webhook:
         ))
 
 # Set logging parameters
-logging.basicConfig(format="%(levelname)s:%(name)s:%(message).255s",
+logging.basicConfig(format="%(levelname)s:%(name)s:%(message).150s",
                     level=logging.INFO)
 loc = "server.py"
 

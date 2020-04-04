@@ -225,7 +225,7 @@ def sell_order(instrument, trading_type, **kwargs):
 
 if __name__ == "__main__":
     # Set logging parameters
-    logging.basicConfig(format="%(levelname)s:%(name)s:%(message).255s",
+    logging.basicConfig(format="%(levelname)s:%(name)s:%(message).150s",
                         level=logging.INFO)
     loc = "oanda.py"
 
