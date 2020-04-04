@@ -2,9 +2,8 @@ import datetime
 import json
 import logging
 import math
-import requests
 
-logging.basicConfig(level=logging.INFO)
+import requests
 
 def get_datetime_offset(offset_minutes=15):
     # In RFC3339
@@ -87,11 +86,12 @@ def get_filtered_instruments(instrument_filter="EUR", trading_type="practice"):
 
     return filtered_instruments
 
-def post_order(instrument, size, price, trailing_stop_loss_percent,
-               take_profit_percent, price_decimals=3, trading_type="practice"):
+def buy_order(instrument, size, price, trailing_stop_loss_percent,
+              take_profit_percent, price_decimals=3, trading_type="practice",
+              **kwargs):
     # https://developer.oanda.com/rest-live-v20/order-ep/
 
-    loc = "oanda.py:post_order"
+    loc = "oanda.py:buy_order"
 
     credentials = get_credentials(trading_type)
 
@@ -118,7 +118,7 @@ def post_order(instrument, size, price, trailing_stop_loss_percent,
                                                price_decimals),
                 "timeInForce": "GTC",
                 "clientExtensions": {
-                    "comment": "oanda.py/post_order/trailing_stop_loss",
+                    "comment": "oanda.py/buy_order/trailing_stop_loss",
                     "tag": "trailing_stop_loss",
                     "id": "{}_trailing_stop_loss".format(get_datetime_now())
                 },
@@ -126,13 +126,13 @@ def post_order(instrument, size, price, trailing_stop_loss_percent,
             "takeProfitOnFill": {
                 "price": "{0:.{1}f}".format(take_profit_price, price_decimals),
                 "clientExtensions": {
-                    "comment": "oanda.py/post_order/take_profit",
+                    "comment": "oanda.py/buy_order/take_profit",
                     "tag": "take_profit",
                     "id": "{}_take_profit".format(get_datetime_now())
                 },
             },
             "clientExtensions": {
-                "comment": "oanda.py/post_order/entry",
+                "comment": "oanda.py/buy_order/entry",
                 "tag": "entry",
                 "id": "{}_entry".format(get_datetime_now())
             },
@@ -155,8 +155,48 @@ def post_order(instrument, size, price, trailing_stop_loss_percent,
 
     return response_json
 
+def sell_order(instrument, trading_type, **kwargs):
+    # https://developer.oanda.com/rest-live-v20/position-ep/
+
+    loc = "oanda.py:sell_order"
+
+    credentials = get_credentials(trading_type)
+
+    url = "{}/v3/accounts/{}/positions/{}/close".format(
+        get_base_url(trading_type),
+        credentials["account_id"],
+        instrument)
+
+    payload = {
+        "longUnits": "ALL",
+        "longClientExtensions": {
+                "comment": "oanda.py/sell_order/close",
+                "tag": "close",
+                "id": "{}_close".format(get_datetime_now())
+            },
+        "shortUnits": "NONE",
+    }
+
+    payload_str = json.dumps(payload)
+    headers = {
+        "Content-Type":"application/json",
+        "Authorization":"Bearer {}".format(credentials["oanda_key"]),
+        "Accept-Datetime-Format":"RFC3339"}
+
+    response = requests.request("PUT", url, headers=headers, data=payload_str)
+    response_text = response.text.encode("utf8")
+    response_json = json.loads(response_text)
+
+    logging.info("{}: {}".format(loc,
+        json.dumps(response_json, indent=2, sort_keys=True)))
+
+    return response_json
+
+
+logging.basicConfig(level=logging.INFO)
+
 if __name__ == "__main__":
-    order_response = post_order(
+    order_response = buy_order(
         instrument="XAU_EUR",
         size=1000, # i.e. €1,000
         price=1486.891,

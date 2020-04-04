@@ -3,6 +3,10 @@
 ## Summary
 I'm setting up a [web.py](https://webpy.org/) server that can run on PythonAnywhere (uploaded there through GitHub) which listens to TradingView alerts on a URL (i.e. webhook) and posts orders (and sets stop-losses, etc.) on OANDA through their API
 
+## Considerations
+* A sell order isn't actually handled as a sell order, but as closing all open positions for the given `instrument`.
+  * Note that if this signal is sent to OANDA when the markets are closed, it will be cancelled.
+
 ## To-do
 1. ~~Set up development environment~~
 1. ~~Install and set up the web.py server~~
@@ -17,13 +21,13 @@ I'm setting up a [web.py](https://webpy.org/) server that can run on PythonAnywh
 1. ~~Add some kind of verification so that only I can send orders through my webhook~~
 1. ~~Move the server to PythonAnywhere so that TradingView can reach it~~
 1. ~~Setup TradingView to send an alert to the server on PythonAnywhere~~
-1. Have the server return the result of a POST request for easier Postman debugging
-1. Have the server translate what TradingView sends as `{{ticker}}` and `{{close}}` to what OANDA expects as `instrument` and `price`
-1. Make `size` optional with a default value set server-side
-1. Add different processing for buy and sell alerts
-1. Test if an alert from TradingView reaches OANDA correctly
-1. Add a mechanism that notifies me of every order (email, maybe?)
+1. ~~Have the server return the result of a POST request for easier Postman debugging~~
+1. ~~Have the server translate what TradingView sends as `{{ticker}}` and `{{close}}` to what OANDA expects as `instrument` and `price`~~
+1. ~~Make `size` optional with a default value set server-side~~
+1. ~~Add different processing for buy and sell alerts~~
 1. Add more alerts to TradingView once I have ironed out the JSON in the alerts
+1. Wait and see if one of those alerts from TradingView reaches OANDA correctly
+1. Add a mechanism that notifies me of every order (email, maybe?)
 
 ## Prerequisites
 * `pip install web.py`
