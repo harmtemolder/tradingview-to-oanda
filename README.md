@@ -18,7 +18,6 @@ I'm setting up a [web.py](https://webpy.org/) server that can run on PythonAnywh
 * `units` the size of the position to open as a positive integer, in the currency of the instrument (e.g. in Euros for "EURUSD" or gold for "XAUEUR"). Defaults to `500`
 * `trailing_stop_loss_percent` the percentage points below `close` on which to start the trailing stop loss as a positive decimal. (E.g. to set it 5% below, enter `0.05`.) Defaults to `0.01`, i.e. 1%. See [OANDA's documentation on trailing stops](https://www1.oanda.com/forex-trading/learn/capital-management/stop-loss) for more information.
 * `take_profit_percent` the percentage points above `close` to set the take profit at as a positive decimal. When the market reaches this point, the position is automatically closed. Defaults to `0.06`, i.e. 6%
-* ~~`price_decimals` the number of decimals to round any calculated prices off to. Defaults to 3. Don't use this.~~
 * `trading_type` either `live` or `practice`, used to select the respective API key and account ID from your `credentials.json` file. Defaults to `practice`
 Any other parameters will not be handled, but are sent along. That means you will see them in your server logs.
 
@@ -43,7 +42,7 @@ Any other parameters will not be handled, but are sent along. That means you wil
 1. ~~Fix the fact that `size` works for XAUEUR, but not for `EURUSD`~~
 1. ~~Rename `close` to `price` in the alerts and everywhere else, in case someone wants to use a different price~~
 1. ~~Add more alerts to TradingView once I have ironed out the JSON in the alerts~~
-1. Automatically set price precision decimals and remove it as a parameter that can be messed with
+1. ~~Automatically set price precision decimals and remove it as a parameter that can be messed with~~
 1. Wait and see if one of those alerts from TradingView reaches OANDA correctly
 1. Add a mechanism that notifies me of every order (email, maybe?)
 1. Think of a way to handle alerts based on the last candle of the day, which will most likely be triggering buys/sells when the markets are closed

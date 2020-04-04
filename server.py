@@ -30,10 +30,6 @@ def fill_defaults(post_data):
         float(post_data["take_profit_percent"])
         if "take_profit_percent" in post_data
         else 0.06) # as positive decimal
-    price_decimals = (
-        post_data["price_decimals"]
-        if "price_decimals" in post_data
-        else 3) # the number of decimals of precision
     trading_type = (
         post_data["trading_type"]
         if "trading_type" in post_data
@@ -45,7 +41,6 @@ def fill_defaults(post_data):
         "price": price,
         "trailing_stop_loss_percent": trailing_stop_loss_percent,
         "take_profit_percent": take_profit_percent,
-        "price_decimals": price_decimals,
         "trading_type": trading_type,
     }
 

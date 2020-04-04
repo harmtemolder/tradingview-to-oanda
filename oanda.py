@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-import math
+import os.path
 
 import requests
 
@@ -66,14 +66,44 @@ def get_instruments(trading_type="practice"):
         "Authorization": "Bearer {}".format(credentials["oanda_key"]),
     }
 
-    response = requests.request("GET", url, headers=headers)
+    instruments_response = requests.request("GET", url, headers=headers)
+    instruments = json.loads(instruments_response.text.encode("utf8"))
+    logging.info("{}: {}".format(loc, instruments))
+    return instruments
 
-    instruments = json.loads(response.text.encode("utf8"))
-    instruments_list = [instrument["name"] for instrument in instruments["instruments"]]
+def get_price_precision(instrument, trading_type="practice"):
+    price_precisions = get_price_precisions(trading_type)
+    return price_precisions[instrument]
 
-    logging.info("{}: {}".format(loc, instruments_list))
+def get_price_precisions(trading_type="practice"):
+    price_precisions_file = "price_precisions.json"
 
-    return instruments_list
+    if os.path.isfile(price_precisions_file):
+        price_precisions = load_price_precisions(price_precisions_file)
+        # Note that there is just 1 list for both trading types,
+        # although I do not think they differ
+    else:
+        price_precisions = save_price_precisions(
+            price_precisions_file, trading_type)
+
+    return price_precisions
+
+def save_price_precisions(price_precisions_file, trading_type="practice"):
+    instruments = get_instruments(trading_type)
+
+    price_precisions = {instrument["name"]:instrument["displayPrecision"] for
+        instrument in instruments["instruments"]}
+
+    with open("price_precisions.json", "w") as price_precisions_json:
+        json.dump(price_precisions, price_precisions_json, indent=2,
+                  sort_keys=True)
+
+    return price_precisions
+
+def load_price_precisions(price_precisions_file):
+    with open(price_precisions_file) as price_precisions_json:
+        price_precisions = (json.load(price_precisions_json))
+    return price_precisions
 
 def get_filtered_instruments(instrument_filter="EUR", trading_type="practice"):
     loc = "oanda.py:get_filtered_instruments"
@@ -87,13 +117,14 @@ def get_filtered_instruments(instrument_filter="EUR", trading_type="practice"):
     return filtered_instruments
 
 def buy_order(instrument, units, price, trailing_stop_loss_percent,
-              take_profit_percent, price_decimals=3, trading_type="practice",
+              take_profit_percent, trading_type="practice",
               **kwargs):
     # https://developer.oanda.com/rest-live-v20/order-ep/
 
     loc = "oanda.py:buy_order"
 
     credentials = get_credentials(trading_type)
+    price_decimals = get_price_precision(instrument, trading_type)
 
     url = "{}/v3/accounts/{}/orders".format(
         get_base_url(trading_type),
@@ -194,14 +225,22 @@ def sell_order(instrument, trading_type, **kwargs):
 
 
 logging.basicConfig(level=logging.INFO)
+loc = "oanda.py"
 
 if __name__ == "__main__":
+
+    # Uncomment this bit to write all instruments and their price
+    # precision—for the given trading type—to price_precisions.json, or
+    # load them from that file if it exists
+    # logging.info("{}: {}".format(loc, json.dumps(
+    #     get_price_precisions(), indent=2, sort_keys=True)))
+
+    # Uncomment this bit to send a buy order to OANDA
     order_response = buy_order(
         instrument="XAU_EUR",
         units=1, # i.e. 1 unit (bar?) of gold
         price=1486.891,
         trailing_stop_loss_percent=0.03, # as positive decimal
         take_profit_percent=0.06, # as positive decimal
-        price_decimals=3, # the number of decimals of precision
         trading_type="practice"
     )
