@@ -18,10 +18,10 @@ def fill_defaults(post_data):
                           .format(loc, e))
         raise
 
-    size = (
-        float(post_data["size"])
-        if "size" in post_data
-        else 500) # in Euros
+    units = (
+        int(post_data["units"])
+        if "units" in post_data
+        else 500) # e.g. in Euros for "EURUSD" or in gold for "XAUEUR"
     trailing_stop_loss_percent = (
         float(post_data["trailing_stop_loss_percent"])
         if "trailing_stop_loss_percent" in post_data
@@ -41,7 +41,7 @@ def fill_defaults(post_data):
 
     return {
         "instrument": instrument,
-        "size": size,
+        "units": units,
         "price": price,
         "trailing_stop_loss_percent": trailing_stop_loss_percent,
         "take_profit_percent": take_profit_percent,
@@ -60,8 +60,6 @@ def translate(post_data):
         else:
             raise ValueError("This ticker does not match my assumptions")
 
-        # Rename `close` to `price`
-        post_data["price"] = post_data.pop("close")
     except KeyError as e:
         logging.exception("{}: One of the parameters I am trying to translate "
                           "does not exist: {}".format(loc, e))

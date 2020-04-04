@@ -86,7 +86,7 @@ def get_filtered_instruments(instrument_filter="EUR", trading_type="practice"):
 
     return filtered_instruments
 
-def buy_order(instrument, size, price, trailing_stop_loss_percent,
+def buy_order(instrument, units, price, trailing_stop_loss_percent,
               take_profit_percent, price_decimals=3, trading_type="practice",
               **kwargs):
     # https://developer.oanda.com/rest-live-v20/order-ep/
@@ -109,9 +109,9 @@ def buy_order(instrument, size, price, trailing_stop_loss_percent,
             "type": "LIMIT",
             "positionFill": "DEFAULT",
             "timeInForce": "GTD",
-            "gtdTime": get_datetime_offset(15),
+            "gtdTime": get_datetime_offset(15), # i.e. 15 m from now
             "instrument": instrument,
-            "units": "{}".format(math.ceil(size / price)), # whole units
+            "units": "{0:d}".format(units), # whole units
             "price": "{0:.{1}f}".format(price, price_decimals),
             "trailingStopLossOnFill": {
                 "distance": "{0:.{1}f}".format(trailing_stop_loss_distance,
@@ -198,7 +198,7 @@ logging.basicConfig(level=logging.INFO)
 if __name__ == "__main__":
     order_response = buy_order(
         instrument="XAU_EUR",
-        size=1000, # i.e. €1,000
+        units=1, # i.e. 1 unit (bar?) of gold
         price=1486.891,
         trailing_stop_loss_percent=0.03, # as positive decimal
         take_profit_percent=0.06, # as positive decimal
