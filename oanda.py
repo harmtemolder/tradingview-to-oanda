@@ -68,7 +68,6 @@ def get_instruments(trading_type="practice"):
 
     instruments_response = requests.request("GET", url, headers=headers)
     instruments = json.loads(instruments_response.text.encode("utf8"))
-    logging.info("{}: {}".format(loc, instruments))
     return instruments
 
 def get_price_precision(instrument, trading_type="practice"):
@@ -110,9 +109,6 @@ def get_filtered_instruments(instrument_filter="EUR", trading_type="practice"):
     instruments = get_instruments(trading_type)
     filtered_instruments = list(filter(lambda i: instrument_filter in i,
                                    instruments))
-
-    logging.info("{}({}): {}".format(loc, instrument_filter,
-                                     filtered_instruments))
 
     return filtered_instruments
 
