@@ -223,11 +223,11 @@ def sell_order(instrument, trading_type, **kwargs):
 
     return response_json
 
-
-logging.basicConfig(level=logging.INFO)
-loc = "oanda.py"
-
 if __name__ == "__main__":
+    # Set logging parameters
+    logging.basicConfig(format="%(levelname)s:%(name)s:%(message).255s",
+                        level=logging.INFO)
+    loc = "oanda.py"
 
     # Uncomment this bit to write all instruments and their price
     # precision—for the given trading type—to price_precisions.json, or

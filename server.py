@@ -139,8 +139,9 @@ class webhook:
         ))
 
 # Set logging parameters
-logging.basicConfig(level=logging.INFO)
-loc = "oanda.py"
+logging.basicConfig(format="%(levelname)s:%(name)s:%(message).255s",
+                    level=logging.INFO)
+loc = "server.py"
 
 # Load the list of access tokens and set webhook URLs for each one
 try:
