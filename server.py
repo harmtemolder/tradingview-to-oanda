@@ -152,15 +152,13 @@ class webhook:
             if post_data["action"] == "buy":
                 order_response = buy_order(**oanda_parameters)
                 mail_subject = ("TradingView to OANDA: Sent an order to buy {} "
-                                "units of {}"
-                    .format(oanda_parameters["units"],
-                            oanda_parameters["instrument"]))
+                                "units of {}".format(
+                    oanda_parameters["units"], oanda_parameters["instrument"]))
             elif post_data["action"] == "sell":
                 order_response = sell_order(**oanda_parameters)
                 mail_subject = ("TradingView to OANDA: Sent an order to close "
-                                "all positions of {}"
-                    .format(oanda_parameters["units"],
-                            oanda_parameters["instrument"]))
+                                "all positions of {}".format(
+                    oanda_parameters["instrument"]))
             else:
                 raise ValueError("You did not specify whether you want to buy "
                                  "or sell")
