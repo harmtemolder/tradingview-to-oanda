@@ -43,24 +43,30 @@ Any other parameters will not be handled, but are sent along. That means you wil
 1. ~~Rename `close` to `price` in the alerts and everywhere else, in case someone wants to use a different price~~
 1. ~~Add more alerts to TradingView once I have ironed out the JSON in the alerts~~
 1. ~~Automatically set price precision decimals and remove it as a parameter that can be messed with~~
-1. Wait and see if one of those alerts from TradingView reaches OANDA correctly
-1. Add a mechanism that notifies me of every order (email, maybe?)
+1. ~~Wait and see if one of those alerts from TradingView reaches OANDA correctly~~
+1. ~~Add a mechanism that notifies me of every order (email, maybe?)~~
+1. Code cleanup, more object-oriented, maybe?
 1. Think of a way to handle alerts based on the last candle of the day, which will most likely be triggering buys/sells when the markets are closed
 
 ## Prerequisites
 * `pip install web.py`
-* `conda install requests`
+* `pip install requests`
+* `pip install sendgrid`, if you choose to use [SendGrid's mail API](https://sendgrid.com/docs/API_Reference/api_v3.html) to send order confirmations from PythonAnywhere to yourself
 * a `credentials.json` file containing a JSON like this:
 
 ```json
 {
-  "practice_credentials": {
-    "oanda_key": "<YOUR PRACTICE ACCOUNT API KEY>",
+  "oanda_practice": {
+    "api_key": "<YOUR PRACTICE ACCOUNT API KEY>",
     "account_id": "<YOUR PRACTICE ACCOUNT ID>"
   },
-  "live_credentials": {
-    "oanda_key": "<YOUR LIVE ACCOUNT API KEY>",
+  "oanda_live": {
+    "api_key": "<YOUR LIVE ACCOUNT API KEY>",
     "account_id": "<YOUR LIVE ACCOUNT ID>"
+  },
+  "sendgrid": {
+    "api_key": "<YOUR SENDGRID API KEY>",
+    "email_address": "<THE ADDRESS TO SEND FROM AND TO>"
   }
 }
 ```
