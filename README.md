@@ -47,7 +47,7 @@ Any other parameters will not be handled, but are sent along. That means you wil
 1. ~~Add a mechanism that notifies me of every order (email, maybe?)~~
 1. `git pull` the latest version to PythonAnywhere so that the email subject of sell orders is correct
 1. Code cleanup, more object-oriented, maybe?
-1. Think of a way to handle alerts based on the last candle of the day, which will most likely be triggering buys/sells when the markets are closed
+1. Think of a way to handle alerts based on the last candle of the day, which will most likely be triggering buys/sells when the markets are closed. Don't forget weekends
 
 ## Prerequisites
 * `pip install web.py`
